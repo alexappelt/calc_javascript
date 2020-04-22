@@ -4,6 +4,7 @@
 class CalcController{
 
 constructor(){                //Criamos um construtor com dois atributos, data e display
+    this._operation = [];
     this.locale = 'pt-BR'   
     this._currentDate;
     this._displayCalcEl = document.querySelector('#display');
@@ -28,7 +29,139 @@ initialize(){
     } , 1000 );
 }
 
+clearAll(){
+this._operation = [];
+this.setLastNumberDisplay();
+}
 
+clearEntry(){
+this._operation.pop();
+this.setLastNumberDisplay();
+}
+
+getLastOperation(){
+    return this._operation[this._operation.length-1];
+}
+
+isOperator(value){
+
+if ((['+' , '-' , '/' , '*' , '%'].indexOf(value))==-1){
+    return false;
+}    
+else{
+    return true;
+}
+}
+
+calc(array){
+    let calc = array.join("");
+    return eval(calc);
+}
+
+pushOperation(value){
+    this._operation.push(value);    
+    if(this._operation.length>3){
+        let lastOp = this._operation.pop();
+        let result = this.calc(this._operation);
+        this._operation = [result , lastOp];
+        parseInt(this._operation);
+        console.log(this._operation);
+    }
+}
+
+setLastNumberDisplay(){
+        
+    this.displayCalc = this._operation.join("");
+}
+
+
+addOperation(value){
+    
+    if(!isNaN(this._operation[(this._operation.length-1)])) //Se o ultimo elemento da operação for um numero
+        {
+        if(this.isOperator(value)){   //Verifica se o valor digitado é um operador
+            
+            this.pushOperation(value);
+            this.setLastNumberDisplay();
+
+        }else{ //Se não for um operador, concatena o ultimo numero e soma com a operação
+        this._operation[(this._operation.length-1)] = parseInt(this._operation[(this._operation.length-1)] + value);
+        this.setLastNumberDisplay();
+    }
+
+   }else if(isNaN(this._operation[(this._operation.length-1)])){
+       if(isNaN(value)){
+           if(this.isOperator(this._operation[(this._operation.length-1)])){
+            this._operation[(this._operation.length-1)] = value; 
+            this.setLastNumberDisplay();
+           }else{
+            this.pushOperation(value);
+            this.setLastNumberDisplay();
+}
+}
+else{
+        this.pushOperation(parseInt(value));
+        this.setLastNumberDisplay();
+}
+}
+    
+}
+
+setError(){
+    this.displayCalc = 'Math Error';
+}
+
+execBtn(value){
+    switch(value){
+    case 'ac':
+    this.clearAll();    
+    break;
+    case 'ce':
+    this.clearEntry();
+    break;
+    case 'soma':
+        this.addOperation('+');
+    break;
+    case 'subtracao':
+        this.addOperation('-');
+    break;
+    case 'divisao':
+        this.addOperation('/');
+    break;
+    case 'multiplicacao':
+        this.addOperation('*');
+    break;
+    case 'porcento':
+        this.addOperation('%');
+    break;
+    case 'igual':
+        console.log('igual');
+        console.log(this._operation);
+        let calc = this._operation.join("");
+        console.log(eval(calc));
+        this.displayCalc = this.calc(this._operation);
+
+       
+
+    break;  
+    
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        this.addOperation(value);
+        break;
+    default:
+        this.setError(); 
+}
+
+};
 
 
 initButtonsEvents(){   //definimos um metodo para os eventos em cada botão
@@ -42,13 +175,20 @@ initButtonsEvents(){   //definimos um metodo para os eventos em cada botão
      
      buttons.forEach((btn, index)=>{
 
-         btn.addEventListener("click", e => {
-            console.log(btn.className.baseVal.replace("btn-" , '')); //Ele vai buscar o nome da classe e substituir btn- por nada                 
-            });
+        btn.addEventListener("click", e => {
+           //btn.className.baseVal.replace("btn-" , ''); //Ele vai buscar o nome da classe e substituir btn- por nada 
+            let textBtn = btn.className.baseVal.replace("btn-" , '');                     
+            this.execBtn(textBtn);
+    
 
-            btn.addEventListener("drag", e => {
-                console.log(btn.className.baseVal.replace("btn-" , '')); //Ele vai buscar o nome da classe e substituir btn- por nada                 
-                });
+        });
+
+        btn.addEventListener("mouseover", e => {
+                         btn.style.cursor = "pointer";  //Deixa o cursor como estilo pointer, "Maozinha ao passar o mouse no btn"
+
+        });
+
+           
               
 
         })
