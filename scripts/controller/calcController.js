@@ -29,6 +29,11 @@ initialize(){
     } , 1000 );
 }
 
+playSong(){
+    let sound = new Audio('click.mp3');
+    sound.play();
+}
+
 clearAll(){
 this._operation = [];
 this.setLastNumberDisplay();
@@ -84,8 +89,15 @@ addOperation(value){
             this.pushOperation(value);
             this.setLastNumberDisplay();
 
-        }else{ //Se não for um operador, concatena o ultimo numero e soma com a operação
-        this._operation[(this._operation.length-1)] = parseInt(this._operation[(this._operation.length-1)] + value);
+        }
+        else if( ((this.getLastOperation())[this.getLastOperation().length-1])== '.'){
+            let last = this.getLastOperation();
+            last = last.toString() + value.toString();
+            this._operation[(this._operation.length-1)] = eval(last);
+            this.setLastNumberDisplay();
+        }
+        else{ //Se não for um operador, concatena o ultimo numero e soma com a operação
+        this._operation[(this._operation.length-1)] = parseFloat(this._operation[(this._operation.length-1)] + value);
         this.setLastNumberDisplay();
     }
 
@@ -111,6 +123,17 @@ setError(){
     this.displayCalc = 'Math Error';
 }
 
+addDot(){
+    console.log(this.getLastOperation());
+if(!isNaN(this.getLastOperation()) ){
+   let last = this.getLastOperation();
+   last = last.toString() + '.';
+    this._operation[this._operation.length-1] = last;
+    this.setLastNumberDisplay();
+}
+
+}
+
 execBtn(value){
     switch(value){
     case 'ac':
@@ -133,6 +156,9 @@ execBtn(value){
     break;
     case 'porcento':
         this.addOperation('%');
+    break;
+    case 'ponto':
+        this.addDot();
     break;
     case 'igual':
         console.log('igual');
@@ -179,6 +205,7 @@ initButtonsEvents(){   //definimos um metodo para os eventos em cada botão
            //btn.className.baseVal.replace("btn-" , ''); //Ele vai buscar o nome da classe e substituir btn- por nada 
             let textBtn = btn.className.baseVal.replace("btn-" , '');                     
             this.execBtn(textBtn);
+            this.playSong();
     
 
         });
